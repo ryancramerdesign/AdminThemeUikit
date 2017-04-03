@@ -1,7 +1,7 @@
 // ProcessWire Inputfield styles
 
 // general purpose
-@pw-inputfield-background: @global-background; 
+@pw-inputfield-background: @global-background;
 @pw-inputfield-background-none: @global-background;
 @pw-inputfield-border-color: darken(@global-muted-background, 4%);
 @pw-inputfield-border: 1px solid @pw-inputfield-border-color;
@@ -56,9 +56,9 @@
 @pw-inputfield-content-padding: @pw-inputfield-content-padding-top @pw-inputfield-content-padding-right @pw-inputfield-content-padding-bottom @pw-inputfield-content-padding-left;
 
 // cards: header padding
-@pw-inputfield-header-cards-padding-top: @global-margin; 
+@pw-inputfield-header-cards-padding-top: @global-margin;
 @pw-inputfield-header-cards-padding-right: @global-small-margin;
-@pw-inputfield-header-cards-padding-bottom: @global-margin; 
+@pw-inputfield-header-cards-padding-bottom: @global-margin;
 @pw-inputfield-header-cards-padding-left: @global-margin;
 @pw-inputfield-header-cards-padding: @pw-inputfield-header-cards-padding-top @pw-inputfield-header-cards-padding-right @pw-inputfield-header-cards-padding-bottom @pw-inputfield-header-cards-padding-left;
 
@@ -86,7 +86,7 @@
   background: @pw-inputfield-background;
   border: none;
   outline: @pw-inputfield-border;
-  
+
   &.InputfieldSubmit,
   &.InputfieldButton,
   &.InputfieldNoBorder,
@@ -94,11 +94,11 @@
   &.InputfieldRepeaterItem {
     outline: none;
   }
-  
+
   &:not(.InputfieldColumnWidth) {
     width: 100%;
   }
-  
+
 
   &.ui-state-error {
     border: none;
@@ -108,17 +108,17 @@
     /* i.e. asmSelect */
     margin-top: 0.1em;
   }
-  
-  input[type=text],
-  input[type=email],
-  input[type=date],
-  input[type=datetime],
-  input[type=number],
-  input[type=url] {
+
+  input[type=text]:not(.uk-input),
+  input[type=email]:not(.uk-input),
+  input[type=date]:not(.uk-input),
+  input[type=datetime]:not(.uk-input),
+  input[type=number]:not(.uk-input),
+  input[type=url]:not(.uk-input) {
     .uk-input();
     width: auto;
   }
-  
+
   select,
   input[type=checkbox],
   input[type=radio] {
@@ -127,11 +127,11 @@
   select {
     max-width: 100%;
   }
-  
+
   textarea {
     .uk-textarea();
   }
- 
+
 }
 
 // Inputfield offsets
@@ -159,9 +159,9 @@ table .InputfieldIsOffset,
 /*** InputfieldHeader ***************************************************/
 
 .InputfieldHeader {
-  
+
   .hook-form-label();
-  
+
   display: block;
   margin: 0;
   padding: @pw-inputfield-header-padding;
@@ -174,24 +174,24 @@ table .InputfieldIsOffset,
     // header is not shown
     display: none;
   }
-  
-  // prevent selection of this element 
+
+  // prevent selection of this element
   -webkit-user-select: none;
   -khtml-user-select: none;
   -moz-user-select: none;
   -o-user-select: none;
-  user-select: none; 
-  
+  user-select: none;
+
   &:hover {
     color: @global-link-color;
   }
-  
+
   // toggles open and collapse of Inputfield
   &.InputfieldStateToggle {
     cursor: pointer;
 
     i.toggle-icon {
-      // the open/close icon that goes with most Inputfields 
+      // the open/close icon that goes with most Inputfields
       float: right;
       padding-right: 0.25em;
       padding-right: 0.5em;
@@ -249,7 +249,7 @@ table .InputfieldIsOffset,
 /*** Inputfield states: collapsed & required *********************************************/
 
 .InputfieldStateCollapsed {
-  
+
   > .InputfieldHeader {
     // header when collapsed
     padding-bottom: @pw-inputfield-header-padding-bottom;
@@ -264,15 +264,15 @@ table .InputfieldIsOffset,
       content: " \2026"; // ellipsis
     }
   }
-  
+
   > .InputfieldContent {
-    // collapsed Inputfields don't show their content (only header) 
+    // collapsed Inputfields don't show their content (only header)
     display: none;
   }
 }
 
 .InputfieldStateRequired > .InputfieldHeader:first-child:after {
-  // Add asterisk to indicate field is required 
+  // Add asterisk to indicate field is required
   content: ' *';
   color: red;
 }
@@ -282,13 +282,13 @@ table .InputfieldIsOffset,
 
 .InputfieldFieldset {
   // fieldset containing other Inputfield elements
-  
+
   > .InputfieldHeader,
   > .InputfieldContent {
     // adjust background color for fieldsets
     background: @pw-inputfield-fieldset-background;
   }
-  
+
   &.WireTab {
     outline: none;
     > .InputfieldContent {
@@ -300,13 +300,13 @@ table .InputfieldIsOffset,
       }
     }
   }
-  
-  
+
+
   &.InputfieldStateCollapsed > .InputfieldHeader {
     // collapsed fieldset has no background color adjustment
     background: @pw-inputfield-background-none;
   }
-  
+
   > .InputfieldContent > .Inputfields {
     // a set of .Inputfields rendered within the content area of a Fieldset
     // remove background so previous shows through
@@ -323,7 +323,7 @@ table .InputfieldIsOffset,
 *:not(.InputfieldContent) > .Inputfields {
   // Inputfields that are not nested within another non-wrapping Inputfield
   > .InputfieldNoBorder {
-    // An inputfield that has no borders or background 
+    // An inputfield that has no borders or background
     &:not(.InputfieldStateCollapsed):not(.InputfieldFieldset) {
       // Inputfield with no border that is open (not collapsed)
       outline: none;
@@ -400,4 +400,3 @@ table.AdminDataTable {
     }
   }
 }
-
