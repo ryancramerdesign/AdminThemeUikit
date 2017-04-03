@@ -86,7 +86,7 @@ $panes = array(
 	}
 	?>
 
-	<div id='pw-layout-container' uk-height-viewport='offset-top: true'>
+	<div id='pw-layout-container' style='height: 100%'>
 		<?php
 		echo $panes['main'];
 		echo $treePane ? $panes['tree'] : $panes['side'] . $panes['tree'];
@@ -142,6 +142,10 @@ $panes = array(
 				}
 				?>
 			}
+
+			// set container height
+			var headerHeight = $("#pw-masthead").data("pw-height");
+			$("#pw-layout-container").css("height", "calc(100% - " + headerHeight + "px)");
 
 			// initialize layout
 			var layout = $('#pw-layout-container').layout(layoutOptions);
