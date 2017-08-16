@@ -82,7 +82,6 @@ export default function (UIkit) {
                         scroll && this.content.scrollTop(scroll.y);
                     }
 
-
                 }
 
             },
@@ -94,7 +93,41 @@ export default function (UIkit) {
         events: [
 
             {
-                name: 'beforeshow',
+
+                name: 'click',
+
+                delegate() {
+                    return 'a[href^="#"]';
+                },
+
+                handler({currentTarget}) {
+                    if (currentTarget.hash && this.content.find(currentTarget.hash).length) {
+                        scroll = null;
+                        this.hide();
+                    }
+                }
+
+            },
+
+            {
+
+                name: 'beforescroll',
+
+                filter() {
+                    return this.overlay;
+                },
+
+                handler(_, scroll, target) {
+                    if (scroll && target && this.isToggled() && this.content.find(target).length) {
+                        this.$el.one('hidden', () => scroll.scrollTo(target));
+                        return false;
+                    }
+                }
+
+            },
+
+            {
+                name: 'show',
 
                 self: true,
 
@@ -117,7 +150,7 @@ export default function (UIkit) {
             },
 
             {
-                name: 'beforehide',
+                name: 'hide',
 
                 self: true,
 
@@ -143,6 +176,9 @@ export default function (UIkit) {
 
                     if (!this.overlay) {
                         scroll = {x: window.pageXOffset, y: window.pageYOffset}
+                    } else if (!scroll) {
+                        var {scrollLeft: x, scrollTop: y} = this.content[0];
+                        scroll = {x, y};
                     }
 
                     this.panel.removeClass(`${this.clsSidebarAnimation} ${this.clsMode}`);

@@ -1,9 +1,9 @@
-/*! UIkit 3.0.0-beta.22 | http://www.getuikit.com | (c) 2014 - 2017 YOOtheme | MIT License */
+/*! UIkit 3.0.0-beta.28 | http://www.getuikit.com | (c) 2014 - 2017 YOOtheme | MIT License */
 
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define('uikitnotification', factory) :
-    (global.UIkitNotification = factory());
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define('uikitnotification', factory) :
+	(global.UIkitNotification = factory());
 }(this, (function () { 'use strict';
 
 function plugin(UIkit) {
@@ -33,7 +33,8 @@ function plugin(UIkit) {
             group: null,
             pos: 'top-center',
             onClose: null,
-            clsClose: 'uk-notification-close'
+            clsClose: 'uk-notification-close',
+            clsMsg: 'uk-notification-message'
         },
 
         created: function created() {
@@ -43,7 +44,7 @@ function plugin(UIkit) {
             }
 
             this.$mount($(
-                ("<div class=\"uk-notification-message" + (this.status ? (" uk-notification-message-" + (this.status)) : '') + "\">\n                    <a href=\"#\" class=\"" + (this.clsClose) + "\" data-uk-close></a>\n                    <div>" + (this.message) + "</div>\n                </div>")
+                ("<div class=\"" + (this.clsMsg) + (this.status ? (" " + (this.clsMsg) + "-" + (this.status)) : '') + "\"> <a href=\"#\" class=\"" + (this.clsClose) + "\" data-uk-close></a> <div>" + (this.message) + "</div> </div>")
             ).appendTo(containers[this.pos].show())[0]);
 
         },
@@ -60,15 +61,12 @@ function plugin(UIkit) {
             ).then(function () {
                 if (this$1.timeout) {
                     this$1.timer = setTimeout(this$1.close, this$1.timeout);
-                    this$1.$el
-                        .on(pointerEnter, function () { return clearTimeout(this$1.timer); })
-                        .on(pointerLeave, function () { return this$1.timer = setTimeout(this$1.close, this$1.timeout); });
                 }
             });
 
         },
 
-        events: {
+        events: ( obj = {
 
             click: function click(e) {
                 if ($(e.target).closest('a[href="#"]').length) {
@@ -77,7 +75,15 @@ function plugin(UIkit) {
                 this.close();
             }
 
-        },
+        }, obj[pointerEnter] = function () {
+                if (this.timer) {
+                    clearTimeout(this.timer);
+                }
+            }, obj[pointerLeave] = function () {
+                if (this.timeout) {
+                    this.timer = setTimeout(this.close, this.timeout);
+                }
+            }, obj ),
 
         methods: {
 
@@ -103,20 +109,21 @@ function plugin(UIkit) {
                 if (immediate) {
                     remove();
                 } else {
-                    Transition.start(this.$el, {opacity: 0, marginTop: -1 * this.$el.outerHeight(), marginBottom: 0}).then(remove)
+                    Transition.start(this.$el, {opacity: 0, marginTop: -1 * this.$el.outerHeight(), marginBottom: 0}).then(remove);
                 }
             }
 
         }
 
     });
+    var obj;
 
     UIkit.notification.closeAll = function (group, immediate) {
         each(UIkit.instances, function (_, component) {
             if (component.$options.name === 'notification' && (!group || group === component.group)) {
                 component.close(immediate);
             }
-        })
+        });
     };
 
 }

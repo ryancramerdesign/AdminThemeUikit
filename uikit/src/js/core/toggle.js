@@ -1,4 +1,4 @@
-import { $, Event, hasTouch, isTouch, pointerEnter, pointerLeave, query } from '../util/index';
+import { $, $trigger, hasTouch, isTouch, pointerEnter, pointerLeave, query } from '../util/index';
 
 export default function (UIkit) {
 
@@ -64,12 +64,12 @@ export default function (UIkit) {
                     }
 
                     // TODO better isToggled handling
-                    var link = $(e.target).closest('a[href]');
+                    var link = $(e.target).closest('a[href]')[0];
                     if ($(e.target).closest('a[href="#"], button').length
-                        || link.length && (
+                        || link && (
                             this.cls
                             || !this.target.is(':visible')
-                            || link.attr('href')[0] === '#' && this.target.is(link.attr('href'))
+                            || link.hash && this.target.is(link.hash)
                         )
                     ) {
                         e.preventDefault();
@@ -103,11 +103,7 @@ export default function (UIkit) {
         methods: {
 
             toggle(type) {
-
-                var event = Event(type || 'toggle');
-                this.target.triggerHandler(event, [this]);
-
-                if (!event.isDefaultPrevented()) {
+                if (!$trigger(this.target, type || 'toggle', [this], true).isDefaultPrevented()) {
                     this.toggleElement(this.target);
                 }
             }

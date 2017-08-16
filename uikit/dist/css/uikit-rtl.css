@@ -43,7 +43,7 @@ a {
  */
 a:active,
 a:hover {
-  outline: 0;
+  outline: none;
 }
 /*
  * Style
@@ -318,7 +318,8 @@ dd {
 /*
  * 1. Add the correct box sizing and height in Firefox.
  * 2. Show the overflow in Edge and IE.
- * 3. Style
+ * 3. Add the correct text-align in Edge and IE.
+ * 4. Style
  */
 hr,
 .uk-hr {
@@ -328,6 +329,8 @@ hr,
   /* 2 */
   overflow: visible;
   /* 3 */
+  text-align: inherit;
+  /* 4 */
   margin: 0 0 20px 0;
   border: 0;
   border-top: 1px solid #e5e5e5;
@@ -489,6 +492,19 @@ a.uk-link-muted:hover,
 .uk-link-muted a:hover {
   color: #666;
 }
+/* Text
+ ========================================================================== */
+/*
+ * `!important` needed to override inverse component
+ */
+a.uk-link-text:not(:hover),
+.uk-link-text a:not(:hover) {
+  color: inherit !important;
+}
+a.uk-link-text:hover,
+.uk-link-text a:hover {
+  color: #999;
+}
 /* Reset
  ========================================================================== */
 /*
@@ -496,10 +512,8 @@ a.uk-link-muted:hover,
  */
 a.uk-link-reset,
 a.uk-link-reset:hover,
-a.uk-link-reset:focus,
 .uk-link-reset a,
-.uk-link-reset a:hover,
-.uk-link-reset a:focus {
+.uk-link-reset a:hover {
   color: inherit !important;
   text-decoration: none !important;
 }
@@ -986,23 +1000,59 @@ a.uk-link-reset:focus,
    Component: Icon
  ========================================================================== */
 /*
- * 1. Fill all SVG elements with the current text color if no `fill` attribute is set
- * 2. Let the container fit the height of the icon
+ * Note: 1. - 7. is required for `button` elements. Needed for Close and Form Icon component.
+ * 1. Remove margins in Chrome, Safari and Opera.
+ * 2. Remove borders for `button`.
+ * 3. Address `overflow` set to `hidden` in IE.
+ * 4. Correct `font` properties and `color` not being inherited for `button`.
+ * 5. Remove the inheritance of text transform in Edge, Firefox, and IE.
+ * 6. Remove default `button` padding and background color
+ * 7. Required for `button`.
+ * 8. Style
+ * 9. Fill all SVG elements with the current text color if no `fill` attribute is set
+ * 10. Let the container fit the height of the icon
  */
 .uk-icon {
-  display: inline-block;
   /* 1 */
-  fill: currentcolor;
+  margin: 0;
   /* 2 */
+  border: none;
+  /* 3 */
+  overflow: visible;
+  /* 4 */
+  font: inherit;
+  color: inherit;
+  /* 5 */
+  text-transform: none;
+  /* 6. */
+  padding: 0;
+  background-color: transparent;
+  /* 7 */
+  cursor: pointer;
+  /* 8 */
+  display: inline-block;
+  /* 9 */
+  fill: currentcolor;
+  /* 10 */
   line-height: 0;
 }
 /*
- * Set the fill and stroke color of all SVG elements to the current text color
+ * Remove the inner border and padding in Firefox.
  */
-.uk-icon [fill*='#']:not(.uk-preserve) {
+.uk-icon::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+/*
+ * Set the fill and stroke color of all SVG elements to the current text color
+ * 1. Fix for uppercase attribute names in Edge. Will be fixed in Windows 10 builds 16251+
+ */
+.uk-icon [fill*='#']:not(.uk-preserve),
+.uk-icon [FILL*='#']:not(.uk-preserve) {
   fill: currentcolor;
 }
-.uk-icon [stroke*='#']:not(.uk-preserve) {
+.uk-icon [stroke*='#']:not(.uk-preserve),
+.uk-icon [STROKE*='#']:not(.uk-preserve) {
   stroke: currentcolor;
 }
 /*
@@ -1081,6 +1131,143 @@ a.uk-link-reset:focus,
 .uk-active > .uk-icon-button {
   background-color: #dfdfdf;
   color: #666;
+}
+/* ========================================================================
+   Component: Form Range
+ ========================================================================== */
+/*
+ * 1. Normalize and defaults
+ * 2. Prevent content overflow if a fixed width is used
+ * 3. Take the full width
+ * 4. Remove default style
+ * 5. Remove white background in Chrome
+ * 6. Remove padding in IE11
+ */
+.uk-range {
+  /* 1 */
+  box-sizing: border-box;
+  margin: 0;
+  vertical-align: middle;
+  /* 2 */
+  max-width: 100%;
+  /* 3 */
+  width: 100%;
+  /* 4 */
+  -webkit-appearance: none;
+  /* 5 */
+  background: transparent;
+  /* 6 */
+  padding: 0;
+}
+/* Focus */
+.uk-range:focus {
+  outline: none;
+}
+.uk-range::-moz-focus-outer {
+  border: none;
+}
+/* IE11 Reset */
+.uk-range::-ms-track {
+  height: 15px;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+/*
+ * Improves consistency of cursor style for clickable elements
+ */
+.uk-range:not(:disabled)::-webkit-slider-thumb {
+  cursor: pointer;
+}
+.uk-range:not(:disabled)::-moz-range-thumb {
+  cursor: pointer;
+}
+.uk-range:not(:disabled)::-ms-thumb {
+  cursor: pointer;
+}
+/* Thumb
+ ========================================================================== */
+/*
+ * 1. Reset
+ * 2. Style
+ */
+/* Webkit */
+.uk-range::-webkit-slider-thumb {
+  /* 1 */
+  -webkit-appearance: none;
+  margin-top: -7px;
+  /* 2 */
+  height: 15px;
+  width: 15px;
+  border-radius: 500px;
+  background: #fff;
+  border: 1px solid #cccccc;
+}
+/* Firefox */
+.uk-range::-moz-range-thumb {
+  /* 1 */
+  border: none;
+  /* 2 */
+  height: 15px;
+  width: 15px;
+  border-radius: 500px;
+  background: #fff;
+  border: 1px solid #cccccc;
+}
+/* Edge */
+.uk-range::-ms-thumb {
+  /* 1 */
+  margin-top: 0;
+}
+/* IE11 */
+.uk-range::-ms-thumb {
+  /* 1 */
+  border: none;
+  /* 2 */
+  height: 15px;
+  width: 15px;
+  border-radius: 500px;
+  background: #fff;
+  border: 1px solid #cccccc;
+}
+/* Edge + IE11 */
+.uk-range::-ms-tooltip {
+  display: none;
+}
+/* Track
+ ========================================================================== */
+/*
+ * 1. Safari doesn't have a focus state. Using active instead.
+ */
+/* Webkit */
+.uk-range::-webkit-slider-runnable-track {
+  height: 3px;
+  background: #ebebeb;
+  border-radius: 500px;
+}
+.uk-range:focus::-webkit-slider-runnable-track,
+.uk-range:active::-webkit-slider-runnable-track {
+  background: #d2d2d2;
+}
+/* Firefox */
+.uk-range::-moz-range-track {
+  height: 3px;
+  background: #ebebeb;
+  border-radius: 500px;
+}
+.uk-range:focus::-moz-range-track {
+  background: #d2d2d2;
+}
+/* Edge */
+.uk-range::-ms-fill-lower,
+.uk-range::-ms-fill-upper {
+  height: 3px;
+  background: #ebebeb;
+  border-radius: 500px;
+}
+.uk-range:focus::-ms-fill-lower,
+.uk-range:focus::-ms-fill-upper {
+  background: #d2d2d2;
 }
 /* ========================================================================
    Component: Form
@@ -1209,7 +1396,7 @@ a.uk-link-reset:focus,
   /* 3 */
   border: 0 none;
   /* 4 */
-  padding: 0 6px;
+  padding: 0 10px;
   background: #fff;
   color: #666;
   border: 1px solid #e5e5e5;
@@ -1220,9 +1407,9 @@ a.uk-link-reset:focus,
 }
 /*
  * Single-line
- * 1. Allow an `a` element to look like a `input` or `select` element
+ * 1. Allow any element to look like an `input` or `select` element
  * 2. Make sure line-height is not larger than height
- *    Also needed to center the text vertically if `a` element is used
+ *    Also needed to center the text vertically
  */
 .uk-input,
 .uk-select:not([multiple]):not([size]) {
@@ -1230,7 +1417,10 @@ a.uk-link-reset:focus,
   vertical-align: middle;
   /* 1 */
   display: inline-block;
-  /* 2 */
+}
+/* 2 */
+.uk-input:not(input),
+.uk-select:not(select) {
   line-height: 38px;
 }
 /*
@@ -1247,7 +1437,7 @@ a.uk-link-reset:focus,
 .uk-input:focus,
 .uk-select:focus,
 .uk-textarea:focus {
-  outline: 0;
+  outline: none;
   background-color: #fff;
   color: #666;
   border-color: #1e87f0;
@@ -1291,6 +1481,10 @@ a.uk-link-reset:focus,
 }
 .uk-form-small:not(textarea):not([multiple]):not([size]) {
   height: 30px;
+  padding-right: 8px;
+  padding-left: 8px;
+}
+.uk-form-small:not(select):not(input):not(textarea) {
   line-height: 28px;
 }
 /*
@@ -1301,6 +1495,10 @@ a.uk-link-reset:focus,
 }
 .uk-form-large:not(textarea):not([multiple]):not([size]) {
   height: 55px;
+  padding-right: 12px;
+  padding-left: 12px;
+}
+.uk-form-large:not(select):not(input):not(textarea) {
   line-height: 53px;
 }
 /* Style modifier (`uk-input`, `uk-select` and `uk-textarea`)
@@ -1339,10 +1537,10 @@ a.uk-link-reset:focus,
  * Different widths for mini sized `input` and `select` elements
  */
 input.uk-form-width-xsmall {
-  width: 40px;
+  width: 50px;
 }
 select.uk-form-width-xsmall {
-  width: 65px;
+  width: 75px;
 }
 .uk-form-width-small {
   width: 130px;
@@ -1366,7 +1564,7 @@ select.uk-form-width-xsmall {
   -moz-appearance: none;
   /* 2 */
   padding-left: 20px;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23666%22%20points%3D%224%201%201%206%207%206%22%3E%3C%2Fpolygon%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23666%22%20points%3D%224%2013%201%208%207%208%22%3E%3C%2Fpolygon%3E%0A%3C%2Fsvg%3E");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2224%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23666%22%20points%3D%2212%201%209%206%2015%206%22%3E%3C%2Fpolygon%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23666%22%20points%3D%2212%2013%209%208%2015%208%22%3E%3C%2Fpolygon%3E%0A%3C%2Fsvg%3E%0A");
   background-repeat: no-repeat;
   background-position: 0% 50%;
 }
@@ -1378,7 +1576,7 @@ select.uk-form-width-xsmall {
  * Disabled
  */
 .uk-select:not([multiple]):not([size]):disabled {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23999%22%20points%3D%224%201%201%206%207%206%22%3E%3C%2Fpolygon%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23999%22%20points%3D%224%2013%201%208%207%208%22%3E%3C%2Fpolygon%3E%0A%3C%2Fsvg%3E");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2224%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23999%22%20points%3D%2212%201%209%206%2015%206%22%3E%3C%2Fpolygon%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22%23999%22%20points%3D%2212%2013%209%208%2015%208%22%3E%3C%2Fpolygon%3E%0A%3C%2Fsvg%3E%0A");
 }
 /* Radio and checkbox
  * Note: Only works in Chrome, Safari, Opera and Edge
@@ -1592,7 +1790,7 @@ select.uk-form-width-xsmall {
   bottom: 0;
   right: 0;
   /* 2 */
-  width: 30px;
+  width: 40px;
   /* 3 */
   display: -ms-inline-flexbox;
   display: -webkit-inline-flex;
@@ -1622,7 +1820,7 @@ select.uk-form-width-xsmall {
  * Input padding
  */
 .uk-form-icon:not(.uk-form-icon-flip) + .uk-input {
-  padding-right: 30px;
+  padding-right: 40px;
 }
 /*
  * Position modifier
@@ -1632,7 +1830,7 @@ select.uk-form-width-xsmall {
   right: auto;
 }
 .uk-form-icon-flip + .uk-input {
-  padding-left: 30px;
+  padding-left: 40px;
 }
 /* ========================================================================
    Component: Button
@@ -2419,12 +2617,25 @@ select.uk-form-width-xsmall {
 .uk-tile {
   position: relative;
   box-sizing: border-box;
-  padding: 30px 30px;
+  padding-right: 15px;
+  padding-left: 15px;
+  padding-top: 40px;
+  padding-bottom: 40px;
 }
-/* Desktop and bigger */
-@media (min-width: 1200px) {
+/* Phone landscape and bigger */
+@media (min-width: 640px) {
   .uk-tile {
-    padding: 40px 40px;
+    padding-right: 30px;
+    padding-left: 30px;
+  }
+}
+/* Tablet landscape and bigger */
+@media (min-width: 960px) {
+  .uk-tile {
+    padding-right: 40px;
+    padding-left: 40px;
+    padding-top: 70px;
+    padding-bottom: 70px;
   }
 }
 /*
@@ -2443,6 +2654,50 @@ select.uk-form-width-xsmall {
  */
 .uk-tile > :last-child {
   margin-bottom: 0;
+}
+/* Size modifiers
+ ========================================================================== */
+/*
+ * XSmall
+ */
+.uk-tile-xsmall {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+/*
+ * Small
+ */
+.uk-tile-small {
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+/*
+ * Large
+ */
+.uk-tile-large {
+  padding-top: 70px;
+  padding-bottom: 70px;
+}
+/* Tablet landscape and bigger */
+@media (min-width: 960px) {
+  .uk-tile-large {
+    padding-top: 140px;
+    padding-bottom: 140px;
+  }
+}
+/*
+ * XLarge
+ */
+.uk-tile-xlarge {
+  padding-top: 140px;
+  padding-bottom: 140px;
+}
+/* Tablet landscape and bigger */
+@media (min-width: 960px) {
+  .uk-tile-xlarge {
+    padding-top: 210px;
+    padding-bottom: 210px;
+  }
 }
 /* Style modifiers
  ========================================================================== */
@@ -2715,45 +2970,13 @@ select.uk-form-width-xsmall {
  ========================================================================== */
 /*
  * Adopts `uk-icon`
- * 1. Remove margins in Chrome, Safari and Opera.
- * 2. Remove borders for `button`.
- * 3. Address `overflow` set to `hidden` in IE.
- * 4. Correct `font` properties and `color` not being inherited for `button`.
- * 5. Remove the inheritance of text transform in Edge, Firefox, and IE.
- * 6. Remove default `button` padding and background color
- * 7. Required for `button`.
- * 8. Re-reset `line-height` for icon
  */
 .uk-close {
-  /* 1 */
-  margin: 0;
-  /* 2 */
-  border: none;
-  /* 3 */
-  overflow: visible;
-  /* 4 */
-  font: inherit;
   color: #999;
-  /* 5 */
-  text-transform: none;
-  /* 6. */
-  padding: 0;
-  background-color: transparent;
-  /* 7 */
-  cursor: pointer;
-  /* 8 */
-  line-height: 0;
   -webkit-transition: 0.1s ease-in-out;
   transition: 0.1s ease-in-out;
   -webkit-transition-property: color, opacity;
   transition-property: color, opacity;
-}
-/*
- * Remove the inner border and padding in Firefox.
- */
-.uk-close::-moz-focus-inner {
-  border: 0;
-  padding: 0;
 }
 /* Hover + Focus */
 .uk-close:hover,
@@ -2848,6 +3071,24 @@ select.uk-form-width-xsmall {
 /* OnClick */
 .uk-totop:active {
   color: #333;
+}
+/* ========================================================================
+   Component: Marker
+ ========================================================================== */
+/*
+ * Addopts `uk-icon`
+ */
+.uk-marker {
+  padding: 5px;
+  background: #222;
+  color: #fff;
+  border-radius: 500px;
+}
+/* Hover + Focus */
+.uk-marker:hover,
+.uk-marker:focus {
+  color: #fff;
+  outline: none;
 }
 /* ========================================================================
    Component: Alert
@@ -3238,7 +3479,7 @@ select.uk-form-width-xsmall {
   color: #666;
 }
 .uk-search-input:focus {
-  outline: 0;
+  outline: none;
 }
 /* Placeholder */
 .uk-search-input:-ms-input-placeholder {
@@ -3896,7 +4137,9 @@ ul.uk-nav-sub {
  * Dropbar modifier
  */
 .uk-navbar-dropdown-dropbar {
-  margin-bottom: 30px;
+  top: 0 !important;
+  margin-top: 0;
+  margin-bottom: 0;
   box-shadow: none;
 }
 /* Dropdown Nav
@@ -3957,6 +4200,7 @@ ul.uk-nav-sub {
   z-index: 1020;
   right: 0;
   left: 0;
+  box-shadow: 0 5px 7px rgba(0, 0, 0, 0.05);
 }
 /*
      * Navbar
@@ -4153,6 +4397,7 @@ ul.uk-nav-sub {
   color: #666;
   text-decoration: none;
 }
+/* Disabled */
 /* Active */
 .uk-breadcrumb > :last-child > * {
   color: #666;
@@ -4709,8 +4954,7 @@ ul.uk-nav-sub {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   /* 4 */
-  padding-right: 15px;
-  padding-left: 15px;
+  padding: 15px 15px;
   /* 5 */
   background: rgba(0, 0, 0, 0.6);
   /* 6 */
@@ -4721,8 +4965,7 @@ ul.uk-nav-sub {
 /* Phone landscape and bigger */
 @media (min-width: 640px) {
   .uk-modal {
-    padding-right: 30px;
-    padding-left: 30px;
+    padding: 50px 30px;
   }
 }
 /* Tablet landscape and bigger */
@@ -4749,7 +4992,7 @@ ul.uk-nav-sub {
 /* Dialog
  ========================================================================== */
 /*
- * 1. Create position context for caption, spinner and close button
+ * 1. Create position context for spinner and close button
  * 2. Dimensions
  * 3. Style
  * 4. Slide-in transition
@@ -4759,7 +5002,7 @@ ul.uk-nav-sub {
   position: relative;
   /* 2 */
   box-sizing: border-box;
-  margin: 50px auto;
+  margin: 0 auto;
   width: 600px;
   max-width: 100%;
   /* 3 */
@@ -4768,15 +5011,10 @@ ul.uk-nav-sub {
   opacity: 0;
   -webkit-transform: translateY(-100px);
   transform: translateY(-100px);
-  -webkit-transition: opacity 0.3s linear, -webkit-transform 0.3s ease-out;
-  transition: opacity 0.3s linear, transform 0.3s ease-out;
-}
-/* Phone portrait and smaller */
-@media (max-width: 639px) {
-  .uk-modal-dialog {
-    margin-top: 15px;
-    margin-bottom: 15px;
-  }
+  -webkit-transition: 0.3s linear;
+  transition: 0.3s linear;
+  -webkit-transition-property: opacity, transform;
+  transition-property: opacity, transform;
 }
 /*
  * Open
@@ -4812,15 +5050,6 @@ ul.uk-nav-sub {
   max-width: 100%;
   -webkit-transform: translateY(0);
   transform: translateY(0);
-}
-/* Lightbox modifier
- ========================================================================== */
-.uk-modal-lightbox {
-  background: rgba(0, 0, 0, 0.9);
-}
-.uk-modal-lightbox .uk-modal-dialog {
-  margin-right: 15px;
-  margin-left: 15px;
 }
 /* Sections
  ========================================================================== */
@@ -4912,16 +5141,151 @@ ul.uk-nav-sub {
   padding: 20px;
   background: #fff;
 }
+/* ========================================================================
+   Component: Lightbox
+ ========================================================================== */
+/*
+ * 1. Hide by default
+ * 2. Set position
+ * 3. Allow scrolling for the modal dialog
+ * 4. Horizontal padding
+ * 5. Mask the background page
+ * 6. Fade-in transition
+ */
+.uk-lightbox {
+  /* 1 */
+  display: none;
+  /* 2 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1010;
+  /* 5 */
+  background: #000;
+  /* 6 */
+  opacity: 0;
+  -webkit-transition: opacity 0.15s linear;
+  transition: opacity 0.15s linear;
+}
+/*
+ * Open
+ * 1. Center child
+ * 2. Fade-in
+ */
+.uk-lightbox.uk-open {
+  display: block;
+  /* 2 */
+  opacity: 1;
+}
+/* Page
+ ========================================================================== */
+/*
+ * Prevent scrollbars
+ */
+.uk-lightbox-page {
+  overflow: hidden;
+}
+/* Item
+ ========================================================================== */
+/*
+ * 1. Center child within the viewport
+ * 2. Not visible by default
+ * 3. Color needed for spinner icon
+ * 4. Responsiveness
+ *    Using `vh` for `max-height` to fix image proportions after resize in Safari and Opera
+ *    Using `vh` and `vw` to make responsive image work in IE11
+ */
+.uk-lightbox-item {
+  /* 1 */
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  /* 2 */
+  display: none;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  /* 2 */
+  color: rgba(255, 255, 255, 0.7);
+}
+/* 4 */
+.uk-lightbox-item > * {
+  max-width: 100vw;
+  max-height: 100vh;
+}
+.uk-lightbox-item > :not(iframe) {
+  width: auto;
+  height: auto;
+}
+.uk-lightbox-item.uk-active {
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
+/* Toolbar
+ ========================================================================== */
+.uk-lightbox-toolbar {
+  padding: 10px 10px;
+  background: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.7);
+}
+.uk-lightbox-toolbar * {
+  color: rgba(255, 255, 255, 0.7);
+}
+/* Toolbar Icon (Close)
+ ========================================================================== */
+.uk-lightbox-toolbar-icon {
+  padding: 5px;
+  color: rgba(255, 255, 255, 0.7);
+}
+/*
+ * Hover
+ */
+.uk-lightbox-toolbar-icon:hover {
+  color: #fff;
+}
+/* Button (Slidenav)
+ ========================================================================== */
+/*
+ * 1. Center icon vertically and horizontally
+ */
+.uk-lightbox-button {
+  box-sizing: border-box;
+  width: 50px;
+  height: 50px;
+  background: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.7);
+  /* 1 */
+  display: -ms-inline-flexbox;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+}
+/*
+ * Hover
+ */
+.uk-lightbox-button:hover {
+  color: #fff;
+}
 /* Caption
  ========================================================================== */
-.uk-modal-caption {
-  position: absolute;
-  right: 0;
-  left: 0;
-  top: 100%;
-  margin-top: 20px;
-  color: #fff;
-  text-align: center;
+/* Iframe
+ ========================================================================== */
+.uk-lightbox-iframe {
+  width: 80%;
+  height: 80%;
 }
 /* ========================================================================
    Component: Sticky
@@ -7506,7 +7870,9 @@ td.uk-text-break {
  * 2. Create position context
  * 3. Prevent content overflow
  * 4. Behave like most inline-block elements
- * 5. Clip child elements
+ * 5. Force hardware acceleration without creating a new stacking context
+ *    to fix 1px glitch when combined with overlays and transitions in Webkit
+ * 6. Clip child elements
  */
 [class*='uk-inline'] {
   /* 1 */
@@ -7517,9 +7883,11 @@ td.uk-text-break {
   max-width: 100%;
   /* 4 */
   vertical-align: middle;
+  /* 5 */
+  -webkit-backface-visibility: hidden;
 }
 .uk-inline-clip {
-  /* 5 */
+  /* 6 */
   overflow: hidden;
 }
 /* Height
@@ -7758,13 +8126,16 @@ td.uk-text-break {
 /*
  * 1. Fill all SVG elements with the current text color if no `fill` attribute is set
  * 2. Set the fill and stroke color of all SVG elements to the current text color
+ * 3. Fix for uppercase attribute names in Edge. Will be fixed in Windows 10 builds 16251+
  */
 /* 1 */
 .uk-svg,
-.uk-svg:not(.uk-preserve) [fill*='#']:not(.uk-preserve) {
+.uk-svg:not(.uk-preserve) [fill*='#']:not(.uk-preserve),
+.uk-svg:not(.uk-preserve) [FILL*='#']:not(.uk-preserve) {
   fill: currentcolor;
 }
-.uk-svg:not(.uk-preserve) [stroke*='#']:not(.uk-preserve) {
+.uk-svg:not(.uk-preserve) [stroke*='#']:not(.uk-preserve),
+.uk-svg:not(.uk-preserve) [STROKE*='#']:not(.uk-preserve) {
   stroke: currentcolor;
 }
 /*
@@ -7846,6 +8217,12 @@ td.uk-text-break {
 }
 .uk-blend-luminosity {
   mix-blend-mode: luminosity;
+}
+/* Transform
+========================================================================== */
+.uk-transform-center {
+  -webkit-transform: translate(50%, -50%);
+  transform: translate(50%, -50%);
 }
 /* Transform Origin
 ========================================================================== */
@@ -8617,18 +8994,18 @@ td.uk-text-break {
   margin: 15px;
 }
 .uk-position-small.uk-position-center {
-  -webkit-transform: translate(calc(-1*(-50% - 15px)), calc(-50% - 15px));
-  transform: translate(calc(-1*(-50% - 15px)), calc(-50% - 15px));
+  -webkit-transform: translate(50%, -50%) translate(15px, -15px);
+  transform: translate(50%, -50%) translate(15px, -15px);
 }
 .uk-position-small.uk-position-center-right,
 .uk-position-small.uk-position-center-left {
-  -webkit-transform: translateY(calc(-50% - 15px));
-  transform: translateY(calc(-50% - 15px));
+  -webkit-transform: translateY(-50%) translateY(-15px);
+  transform: translateY(-50%) translateY(-15px);
 }
 .uk-position-small.uk-position-top-center,
 .uk-position-small.uk-position-bottom-center {
-  -webkit-transform: translateX(calc(-1*(-50% - 15px)));
-  transform: translateX(calc(-1*(-50% - 15px)));
+  -webkit-transform: translateX(50%) translateX(15px);
+  transform: translateX(50%) translateX(15px);
 }
 /*
  * Medium
@@ -8637,18 +9014,18 @@ td.uk-text-break {
   margin: 30px;
 }
 .uk-position-medium.uk-position-center {
-  -webkit-transform: translate(calc(-1*(-50% - 30px)), calc(-50% - 30px));
-  transform: translate(calc(-1*(-50% - 30px)), calc(-50% - 30px));
+  -webkit-transform: translate(50%, -50%) translate(30px, -30px);
+  transform: translate(50%, -50%) translate(30px, -30px);
 }
 .uk-position-medium.uk-position-center-right,
 .uk-position-medium.uk-position-center-left {
-  -webkit-transform: translateY(calc(-50% - 30px));
-  transform: translateY(calc(-50% - 30px));
+  -webkit-transform: translateY(-50%) translateY(-30px);
+  transform: translateY(-50%) translateY(-30px);
 }
 .uk-position-medium.uk-position-top-center,
 .uk-position-medium.uk-position-bottom-center {
-  -webkit-transform: translateX(calc(-1*(-50% - 30px)));
-  transform: translateX(calc(-1*(-50% - 30px)));
+  -webkit-transform: translateX(50%) translateX(30px);
+  transform: translateX(50%) translateX(30px);
 }
 /* ========================================================================
    Component: Transition
@@ -8850,6 +9227,31 @@ td.uk-text-break {
 /* Invisible */
 .uk-visible-toggle:not(:hover):not(.uk-hover) .uk-invisible-hover {
   visibility: hidden !important;
+}
+/* Touch
+ ========================================================================== */
+/*
+ * Hide if primary pointing device has limited accuracy, e.g. a touch screen.
+ * Works on mobile browsers: Safari, Chrome and Android browser
+ */
+@media (pointer: coarse) {
+  .uk-hidden-touch {
+    display: none !important;
+  }
+}
+/*
+ * Hide if primary pointing device is accurate, e.g. mouse.
+ * 1. Fallback for IE11 and Firefox, because `pointer` is not supported
+ * 2. Reset if supported
+ */
+/* 1 */
+.uk-hidden-notouch {
+  display: none !important;
+}
+@media (pointer: coarse) {
+  .uk-hidden-notouch {
+    display: block !important;
+  }
 }
 /* ========================================================================
    Component: Inverse
@@ -9189,6 +9591,30 @@ td.uk-text-break {
 .uk-offcanvas-bar a.uk-link-muted:hover,
 .uk-offcanvas-bar .uk-link-muted a:hover {
   color: rgba(255, 255, 255, 0.7);
+}
+.uk-light a.uk-link-text:hover,
+.uk-light .uk-link-text a:hover,
+.uk-section-primary:not(.uk-preserve-color) a.uk-link-text:hover,
+.uk-section-primary:not(.uk-preserve-color) .uk-link-text a:hover,
+.uk-section-secondary:not(.uk-preserve-color) a.uk-link-text:hover,
+.uk-section-secondary:not(.uk-preserve-color) .uk-link-text a:hover,
+.uk-tile-primary:not(.uk-preserve-color) a.uk-link-text:hover,
+.uk-tile-primary:not(.uk-preserve-color) .uk-link-text a:hover,
+.uk-tile-secondary:not(.uk-preserve-color) a.uk-link-text:hover,
+.uk-tile-secondary:not(.uk-preserve-color) .uk-link-text a:hover,
+.uk-card-primary.uk-card-body a.uk-link-text:hover,
+.uk-card-primary.uk-card-body .uk-link-text a:hover,
+.uk-card-primary > :not([class*='uk-card-media']) a.uk-link-text:hover,
+.uk-card-primary > :not([class*='uk-card-media']) .uk-link-text a:hover,
+.uk-card-secondary.uk-card-body a.uk-link-text:hover,
+.uk-card-secondary.uk-card-body .uk-link-text a:hover,
+.uk-card-secondary > :not([class*='uk-card-media']) a.uk-link-text:hover,
+.uk-card-secondary > :not([class*='uk-card-media']) .uk-link-text a:hover,
+.uk-overlay-primary a.uk-link-text:hover,
+.uk-overlay-primary .uk-link-text a:hover,
+.uk-offcanvas-bar a.uk-link-text:hover,
+.uk-offcanvas-bar .uk-link-text a:hover {
+  color: rgba(255, 255, 255, 0.5);
 }
 .uk-light .uk-heading-divider,
 .uk-section-primary:not(.uk-preserve-color) .uk-heading-divider,
@@ -9756,7 +10182,7 @@ td.uk-text-break {
 .uk-card-secondary > :not([class*='uk-card-media']) .uk-select:not([multiple]):not([size]),
 .uk-overlay-primary .uk-select:not([multiple]):not([size]),
 .uk-offcanvas-bar .uk-select:not([multiple]):not([size]) {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22rgba%28255,%20255,%20255,%200.7%29%22%20points%3D%224%201%201%206%207%206%22%3E%3C%2Fpolygon%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22rgba%28255,%20255,%20255,%200.7%29%22%20points%3D%224%2013%201%208%207%208%22%3E%3C%2Fpolygon%3E%0A%3C%2Fsvg%3E");
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2224%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22rgba%28255,%20255,%20255,%200.7%29%22%20points%3D%2212%201%209%206%2015%206%22%3E%3C%2Fpolygon%3E%0A%20%20%20%20%3Cpolygon%20fill%3D%22rgba%28255,%20255,%20255,%200.7%29%22%20points%3D%2212%2013%209%208%2015%208%22%3E%3C%2Fpolygon%3E%0A%3C%2Fsvg%3E%0A");
 }
 .uk-light .uk-radio,
 .uk-light .uk-checkbox,
@@ -10188,6 +10614,43 @@ td.uk-text-break {
 .uk-offcanvas-bar .uk-button-text:disabled {
   color: rgba(255, 255, 255, 0.5);
 }
+.uk-light .uk-button-link,
+.uk-section-primary:not(.uk-preserve-color) .uk-button-link,
+.uk-section-secondary:not(.uk-preserve-color) .uk-button-link,
+.uk-tile-primary:not(.uk-preserve-color) .uk-button-link,
+.uk-tile-secondary:not(.uk-preserve-color) .uk-button-link,
+.uk-card-primary.uk-card-body .uk-button-link,
+.uk-card-primary > :not([class*='uk-card-media']) .uk-button-link,
+.uk-card-secondary.uk-card-body .uk-button-link,
+.uk-card-secondary > :not([class*='uk-card-media']) .uk-button-link,
+.uk-overlay-primary .uk-button-link,
+.uk-offcanvas-bar .uk-button-link {
+  color: rgba(255, 255, 255, 0.5);
+}
+.uk-light .uk-button-link:hover,
+.uk-light .uk-button-link:focus,
+.uk-section-primary:not(.uk-preserve-color) .uk-button-link:hover,
+.uk-section-primary:not(.uk-preserve-color) .uk-button-link:focus,
+.uk-section-secondary:not(.uk-preserve-color) .uk-button-link:hover,
+.uk-section-secondary:not(.uk-preserve-color) .uk-button-link:focus,
+.uk-tile-primary:not(.uk-preserve-color) .uk-button-link:hover,
+.uk-tile-primary:not(.uk-preserve-color) .uk-button-link:focus,
+.uk-tile-secondary:not(.uk-preserve-color) .uk-button-link:hover,
+.uk-tile-secondary:not(.uk-preserve-color) .uk-button-link:focus,
+.uk-card-primary.uk-card-body .uk-button-link:hover,
+.uk-card-primary.uk-card-body .uk-button-link:focus,
+.uk-card-primary > :not([class*='uk-card-media']) .uk-button-link:hover,
+.uk-card-primary > :not([class*='uk-card-media']) .uk-button-link:focus,
+.uk-card-secondary.uk-card-body .uk-button-link:hover,
+.uk-card-secondary.uk-card-body .uk-button-link:focus,
+.uk-card-secondary > :not([class*='uk-card-media']) .uk-button-link:hover,
+.uk-card-secondary > :not([class*='uk-card-media']) .uk-button-link:focus,
+.uk-overlay-primary .uk-button-link:hover,
+.uk-overlay-primary .uk-button-link:focus,
+.uk-offcanvas-bar .uk-button-link:hover,
+.uk-offcanvas-bar .uk-button-link:focus {
+  color: rgba(255, 255, 255, 0.7);
+}
 .uk-light .uk-grid-divider > :not(.uk-first-column)::before,
 .uk-section-primary:not(.uk-preserve-color) .uk-grid-divider > :not(.uk-first-column)::before,
 .uk-section-secondary:not(.uk-preserve-color) .uk-grid-divider > :not(.uk-first-column)::before,
@@ -10300,6 +10763,44 @@ td.uk-text-break {
 .uk-overlay-primary .uk-totop:active,
 .uk-offcanvas-bar .uk-totop:active {
   color: #fff;
+}
+.uk-light .uk-marker,
+.uk-section-primary:not(.uk-preserve-color) .uk-marker,
+.uk-section-secondary:not(.uk-preserve-color) .uk-marker,
+.uk-tile-primary:not(.uk-preserve-color) .uk-marker,
+.uk-tile-secondary:not(.uk-preserve-color) .uk-marker,
+.uk-card-primary.uk-card-body .uk-marker,
+.uk-card-primary > :not([class*='uk-card-media']) .uk-marker,
+.uk-card-secondary.uk-card-body .uk-marker,
+.uk-card-secondary > :not([class*='uk-card-media']) .uk-marker,
+.uk-overlay-primary .uk-marker,
+.uk-offcanvas-bar .uk-marker {
+  background: #f8f8f8;
+  color: #666;
+}
+.uk-light .uk-marker:hover,
+.uk-light .uk-marker:focus,
+.uk-section-primary:not(.uk-preserve-color) .uk-marker:hover,
+.uk-section-primary:not(.uk-preserve-color) .uk-marker:focus,
+.uk-section-secondary:not(.uk-preserve-color) .uk-marker:hover,
+.uk-section-secondary:not(.uk-preserve-color) .uk-marker:focus,
+.uk-tile-primary:not(.uk-preserve-color) .uk-marker:hover,
+.uk-tile-primary:not(.uk-preserve-color) .uk-marker:focus,
+.uk-tile-secondary:not(.uk-preserve-color) .uk-marker:hover,
+.uk-tile-secondary:not(.uk-preserve-color) .uk-marker:focus,
+.uk-card-primary.uk-card-body .uk-marker:hover,
+.uk-card-primary.uk-card-body .uk-marker:focus,
+.uk-card-primary > :not([class*='uk-card-media']) .uk-marker:hover,
+.uk-card-primary > :not([class*='uk-card-media']) .uk-marker:focus,
+.uk-card-secondary.uk-card-body .uk-marker:hover,
+.uk-card-secondary.uk-card-body .uk-marker:focus,
+.uk-card-secondary > :not([class*='uk-card-media']) .uk-marker:hover,
+.uk-card-secondary > :not([class*='uk-card-media']) .uk-marker:focus,
+.uk-overlay-primary .uk-marker:hover,
+.uk-overlay-primary .uk-marker:focus,
+.uk-offcanvas-bar .uk-marker:hover,
+.uk-offcanvas-bar .uk-marker:focus {
+  color: #666;
 }
 .uk-light .uk-badge,
 .uk-section-primary:not(.uk-preserve-color) .uk-badge,

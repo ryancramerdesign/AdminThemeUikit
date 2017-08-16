@@ -1,14 +1,15 @@
 import $ from 'jquery';
-import { animationend, assign, contains, each, Event, getContextSelectors, isNumber, isString, promise, requestAnimationFrame, toNode, toJQuery, transitionend } from './index';
+import { animationend, assign, clamp, each, Event, getContextSelectors, isBoolean, isNumber, isString, promise, requestAnimationFrame, toNode, toJQuery, transitionend } from './index';
 
+var docEl = document.documentElement;
 export const win = $(window);
 export const doc = $(document);
-export const docElement = $(document.documentElement);
+export const docElement = $(docEl);
 
-export const isRtl = $('html').attr('dir') === 'rtl';
+export const isRtl = docEl.getAttribute('dir') === 'rtl';
 
 export function isReady() {
-    return document.readyState === 'complete' || document.readyState !== 'loading' && !document.documentElement.doScroll;
+    return document.readyState === 'complete' || document.readyState !== 'loading' && !docEl.doScroll;
 }
 
 export function ready(fn) {
@@ -28,17 +29,42 @@ export function ready(fn) {
 
 }
 
-export function on(el, type, listener, useCapture) {
+export function on(el, type, listener, useCapture = false) {
     type.split(' ').forEach(type => toNode(el).addEventListener(type, listener, useCapture));
 }
 
-export function off(el, type, listener, useCapture) {
+export function off(el, type, listener, useCapture = false) {
     type.split(' ').forEach(type => toNode(el).removeEventListener(type, listener, useCapture));
+}
+
+export function one(el, type, listener, useCapture, condition) {
+
+    var handler = e => {
+        var result = !condition || condition(e);
+        if (result) {
+            type.split(' ').forEach(type => off(el, type, handler, useCapture));
+            listener(e, result);
+        }
+    };
+
+    type.split(' ').forEach(type => on(el, type, handler, useCapture));
+}
+
+export function trigger(element, event) {
+    var e = createEvent(event);
+    toNode(element).dispatchEvent(e);
+    return e;
+}
+
+export function $trigger(element, event, data, local = false) {
+    var e = event instanceof Event ? event : Event(event);
+    $(element)[local ? 'triggerHandler' : 'trigger'](e, data);
+    return e;
 }
 
 export function transition(element, props, duration = 400, transition = 'linear') {
 
-    var p = promise((resolve, reject) => {
+    return promise((resolve, reject) => {
 
         element = $(element);
 
@@ -46,28 +72,20 @@ export function transition(element, props, duration = 400, transition = 'linear'
             element.css(name, element.css(name));
         }
 
-        let timer = setTimeout(() => element.trigger(transitionend || 'transitionend'), duration);
+        var timer = setTimeout(() => element.trigger(transitionend), duration);
 
         element
-            .one(transitionend || 'transitionend', (e, cancel) => {
-
-                e.promise = p;
-
+            .one(transitionend, (e, cancel) => {
                 clearTimeout(timer);
                 element.removeClass('uk-transition').css('transition', '');
-                if (!cancel) {
-                    resolve();
-                } else {
-                    reject();
-                }
+                cancel ? reject() : resolve();
             })
             .addClass('uk-transition')
             .css('transition', `all ${duration}ms ${transition}`)
             .css(props);
 
-    }).then(null, () => {});
+    });
 
-    return p;
 }
 
 export const Transition = {
@@ -75,9 +93,8 @@ export const Transition = {
     start: transition,
 
     stop(element, cancel) {
-        var e = Event(transitionend || 'transitionend');
-        $(element).triggerHandler(e, [cancel]);
-        return e.promise || promise.resolve();
+        $trigger(element, transitionend, [cancel], true);
+        return promise.resolve();
     },
 
     cancel(element) {
@@ -92,20 +109,20 @@ export const Transition = {
 
 export function animate(element, animation, duration = 200, origin, out) {
 
-    var p = promise(resolve => {
+    return promise((resolve, reject) => {
 
-        var cls = out ? 'uk-animation-leave' : 'uk-animation-enter';
+        var cls = `${animation}${out ? ' uk-animation-leave' : ' uk-animation-enter'}`;
 
         element = $(element);
 
         if (animation.lastIndexOf('uk-animation-', 0) === 0) {
 
             if (origin) {
-                animation += ` uk-animation-${origin}`;
+                cls += ` uk-animation-${origin}`;
             }
 
             if (out) {
-                animation += ' uk-animation-reverse';
+                cls += ' uk-animation-reverse';
             }
 
         }
@@ -113,27 +130,23 @@ export function animate(element, animation, duration = 200, origin, out) {
         reset();
 
         element
-            .one(animationend || 'animationend', e => {
-                e.promise = p;
-                p.then(reset);
-                resolve();
+            .one(animationend || 'animationend', (e, cancel) => {
+                reset();
+                cancel ? reject() : resolve();
             })
             .css('animation-duration', `${duration}ms`)
-            .addClass(animation)
             .addClass(cls);
-
 
         if (!animationend) {
             requestAnimationFrame(() => Animation.cancel(element));
         }
 
         function reset() {
-            element.css('animation-duration', '').removeClass(`${cls} ${animation}`);
+            element.css('animation-duration', '').removeClass(cls);
         }
 
     });
 
-    return p;
 }
 
 export const Animation = {
@@ -151,9 +164,8 @@ export const Animation = {
     },
 
     cancel(element) {
-        var e = Event(animationend || 'animationend');
-        $(element).triggerHandler(e);
-        return e.promise || promise.resolve();
+        $trigger(element, animationend || 'animationend', [true], true);
+        return promise.resolve();
     }
 
 };
@@ -164,9 +176,11 @@ export function isJQuery(obj) {
 
 export function isWithin(element, selector) {
     element = $(element);
-    return element.is(selector) || !!(isString(selector)
-        ? element.parents(selector).length
-        : contains(toNode(selector), element[0]));
+    return element.is(selector)
+        ? true
+        : isString(selector)
+            ? element.parents(selector).length
+            : toNode(selector).contains(element[0]);
 }
 
 export function attrFilter(element, attr, pattern, replacement) {
@@ -198,8 +212,37 @@ export function isInView(element, offsetTop = 0, offsetLeft = 0) {
 
     return rect.bottom >= -1 * offsetTop
         && rect.right >= -1 * offsetLeft
-        && rect.top <= (window.innerHeight || document.documentElement.clientHeight) + offsetTop
-        && rect.left <= (window.innerWidth || document.documentElement.clientWidth) + offsetLeft;
+        && rect.top <= window.innerHeight + offsetTop
+        && rect.left <= window.innerWidth + offsetLeft;
+}
+
+export function scrolledOver(element) {
+
+    element = toNode(element);
+
+    var height = element.offsetHeight,
+        top = positionTop(element),
+        vp = window.innerHeight,
+        vh = vp + Math.min(0, top - vp),
+        diff = Math.max(0, vp - (docHeight() - (top + height)));
+
+    return clamp(((vh + window.pageYOffset - top) / ((vh + (height - (diff < vp ? diff : 0)) ) / 100)) / 100);
+}
+
+function positionTop(element) {
+    var top = 0;
+
+    do {
+
+        top += element.offsetTop;
+
+    } while (element = element.offsetParent);
+
+    return top;
+}
+
+export function docHeight() {
+    return Math.max(docEl.offsetHeight, docEl.scrollHeight);
 }
 
 export function getIndex(index, elements, current = 0) {
@@ -256,7 +299,7 @@ export const Dimensions = {
         };
     },
 
-    fit(dimensions, maxDimensions) {
+    contain(dimensions, maxDimensions) {
         dimensions = assign({}, dimensions);
 
         each(dimensions, prop => dimensions = dimensions[prop] > maxDimensions[prop] ? this.ratio(dimensions, prop, maxDimensions[prop]) : dimensions);
@@ -265,7 +308,7 @@ export const Dimensions = {
     },
 
     cover(dimensions, maxDimensions) {
-        dimensions = this.fit(dimensions, maxDimensions);
+        dimensions = this.contain(dimensions, maxDimensions);
 
         each(dimensions, prop => dimensions = dimensions[prop] < maxDimensions[prop] ? this.ratio(dimensions, prop, maxDimensions[prop]) : dimensions);
 
@@ -277,4 +320,26 @@ export const Dimensions = {
 export function query(selector, context) {
     var selectors = getContextSelectors(selector);
     return selectors ? selectors.reduce((context, selector) => toJQuery(selector, context), context) : toJQuery(selector);
+}
+
+export function preventClick() {
+
+    var timer = setTimeout(() => trigger(doc, 'click'), 0);
+
+    one(doc, 'click', e => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        clearTimeout(timer);
+    }, true);
+
+}
+
+export function getData(el, attribute) {
+    el = toNode(el);
+    for (var i = 0, attrs = [attribute, `data-${attribute}`]; i < attrs.length; i++) {
+        if (el.hasAttribute(attrs[i])) {
+            return el.getAttribute(attrs[i]);
+        }
+    }
 }
