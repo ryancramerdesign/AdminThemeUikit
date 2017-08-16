@@ -2,7 +2,7 @@
 
 /**
  * AdminThemeUikit
- * 
+ *
  * @property bool $isSuperuser Is current user a superuser?
  * @property bool $isEditor Does current user have page-edit permission?
  * @property bool $isLoggedIn Is current user logged in?
@@ -10,10 +10,10 @@
  * @property array $noBorderTypes Inputfield class names that should always use the noBorder option (when 100% width).
  * @property array $cardTypes Inputfield class names that should always use the card option.
  * @property array $offsetTypes Inputfield class names that should always use the offset option.
- * @property string $logoURL URL to custom logo, relative to PW installation root. 
- * @property string $cssURL URL to custom CSS file, relative to PW installation root. 
+ * @property string $logoURL URL to custom logo, relative to PW installation root.
+ * @property string $cssURL URL to custom CSS file, relative to PW installation root.
  * @property string $layout Layout type (blank=default, sidenav=multi-pane, sidenav-tree=left-tree, sidenav-tree-alt=right-tree)
- * 
+ *
  */
 class AdminThemeUikit extends AdminThemeFramework implements Module, ConfigurableModule {
 
@@ -22,38 +22,38 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 			'title' => 'Uikit',
 			'version' => 8,
 			'summary' => 'Base Uikit v3 admin theme',
-			'autoload' => true, 
+			'autoload' => true,
 			'requires' => 'ProcessWire>=3.0.59'
-		); 
+		);
 	}
 
 	/**
 	 * Development mode, to be used when developing this module’s code
 	 *
 	 */
-	const dev = true;
+	const dev = false;
 
 	/**
 	 * Default logo image file (relative to this dir)
-	 * 
+	 *
 	 */
 	const logo = 'uikit/custom/images/pw-mark.png';
 
 	/**
 	 * sidenavType: primary navigation on left sidebar
-	 * 
+	 *
 	 */
 	const sidenavTypePrimary = 0;
 
 	/**
 	 * sidenavType: tree navigation on left sidebar
-	 * 
+	 *
 	 */
 	const sidenavTypeTree = 1;
 
 	/**
 	 * Construct and establish default module config settings
-	 * 
+	 *
 	 */
 	public function __construct() {
 		$config = $this->wire('config');
@@ -66,34 +66,34 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 		$this->set('cssURL', '');
 		$this->set('layout', '');
 		$this->set('noBorderTypes', array(
-			'InputfieldCKEditor', 
+			'InputfieldCKEditor',
 		));
 	}
-	
+
 	public function init() {
 		// intentionally blank
 	}
 
 	/**
 	 * Initialize and attach hooks
-	 * 
+	 *
 	 */
 	public function ready() {
-	
+
 		$page = $this->wire('page');
-		
+
 		if($page->template != 'admin') {
 			// front-end
-			if(strpos($this->layout, 'sidenav') === 0) { 
-				// ensure that page edit links on front-end load the sidenav-init 
+			if(strpos($this->layout, 'sidenav') === 0) {
+				// ensure that page edit links on front-end load the sidenav-init
 				$this->wire('session')->setFor('Page', 'appendEditUrl', "&layout=sidenav-init");
 			}
 			return;
-		} 
-		
+		}
+
 		$this->wire('session')->removeFor('Page', 'appendEditUrl');
-		parent::init(); 
-		
+		parent::init();
+
 		// if this is not the current admin theme, exit now so no hooks are attached
 		if(!$this->isCurrent()) return;
 
@@ -104,33 +104,33 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 		$this->addHookBefore('Inputfield::renderValue', $this, 'hookBeforeRenderInputfield');
 		$this->addHookAfter('Inputfield::getConfigInputfields', $this, 'hookAfterInputfieldGetConfigInputfields');
 		$this->addHookAfter('MarkupAdminDataTable::render', $this, 'hookAfterTableRender');
-	
+
 		// hooks and settings specific to sidebar layouts
-		if(strpos($this->layout, 'sidenav') === 0) { 
+		if(strpos($this->layout, 'sidenav') === 0) {
 			$this->addHookAfter('ProcessLogin::afterLoginURL', $this, 'hookAfterLoginURL');
 			if(strpos($this->layout, 'sidenav-tree') === 0) {
 				// page-edit breadcrumbs go to page editor when page tree is always in sidebar
 				$this->wire('config')->pageEdit('editCrumbs', true);
 			}
 		}
-		
+
 		// add cache clearing hooks
 		$this->wire('pages')->addHookAfter('saved', $this, 'hookClearCaches');
 		$this->wire('modules')->addHookAfter('refresh', $this, 'hookClearCaches');
 	}
-	
+
 	/*******************************************************************************************
 	 * HOOKS
 	 *
 	 */
 
 	/**
-	 * Hook called before each Inputfield::render 
-	 * 
-	 * This updates the Inputfield classes and settings for Uikit. 
-	 * 
+	 * Hook called before each Inputfield::render
+	 *
+	 * This updates the Inputfield classes and settings for Uikit.
+	 *
 	 * @param HookEvent $event
-	 * 
+	 *
 	 */
 	public function hookBeforeRenderInputfield(HookEvent $event) {
 
@@ -139,25 +139,25 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 		$class = $inputfield->className();
 		$formSettings = $event->wire('config')->get('InputfieldForm');
 		$widths = $formSettings['ukGridWidths'];
-		$columnWidth = (int) $inputfield->getSetting('columnWidth'); 
+		$columnWidth = (int) $inputfield->getSetting('columnWidth');
 		if($columnWidth < 10) $columnWidth = 100;
-		
-		
+
+
 		if($inputfield instanceof InputfieldSubmit) {
 			// button
 			$inputfield->addClass('uk-width-auto uk-margin-top', 'wrapClass');
 			return; // no further settings needed for button
 		}
-		
+
 		$isFieldset = $inputfield instanceof InputfieldFieldset;
 		$isWrapper = $inputfield instanceof InputfieldWrapper && !$isFieldset;
-		
+
 		$useNoBorder = $formSettings['useBorders'] === false || (in_array($class, $this->noBorderTypes) && $columnWidth == 100);
 		$useCard = in_array($class, $this->cardTypes);
-		
+
 		// determine column width class
 		$ukClass = '1-1';
-		
+
 		if($columnWidth && $columnWidth < 100) {
 			if($columnWidth < 16) $columnWidth = 16;
 			foreach($widths as $uk => $pct) {
@@ -167,10 +167,10 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 				}
 			}
 		}
-		
+
 		$inputfield->addClass("uk-width-$ukClass@m", 'wrapClass');
 		$themeColor = '';
-		
+
 		if($isWrapper) {
 			return; // no further settings necessary for InputfieldWrapper
 		} else if($inputfield instanceof InputfieldTextarea) {
@@ -201,13 +201,13 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 			if($themeOffset === null) $themeOffset = $field->get('themeOffset');
 			if($themeColor === null) $themeColor = $field->get('themeColor');
 		}
-		
+
 		if($themeBorder == 'none') {
 			$useNoBorder = true;
 		} else if($themeBorder == 'card') {
 			$useCard = true;
 		}
-	
+
 		switch($themeColor) {
 			case 'primary':
 				$inputfield->addClass('InputfieldIsPrimary', 'wrapClass');
@@ -231,7 +231,7 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 		} else if($useCard) {
 			$inputfield->addClass('uk-card uk-card-default', 'wrapClass');
 		}
-	
+
 		if($themeOffset && !$this->useOffset) {
 			$inputfield->addClass('InputfieldIsOffset', 'wrapClass');
 		}
@@ -239,26 +239,26 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 
 	/**
 	 * Hook after Inputfield::getConfigInputfields() to add theme-specific configuration settings
-	 * 
+	 *
 	 * @param HookEvent $event
-	 * 
+	 *
 	 */
 	public function hookAfterInputfieldGetConfigInputfields(HookEvent $event) {
-		
+
 		/** @var Inputfield $inputfield */
 		$inputfield = $event->object;
 		if($inputfield instanceof InputfieldWrapper) return;
 		$field = $inputfield->hasField;
 		$formSettings = $this->wire('config')->get('InputfieldForm');
-		
+
 		/** @var InputfieldWrapper $inputfields */
 		$inputfields = $event->return;
 		if(!$inputfields) return;
-		
+
 		/** @var InputfieldFieldset $fieldsetVisibility */
 		$fieldsetVisibility = $inputfields->getChildByName('visibility');
 		if(!$fieldsetVisibility) return;
-		
+
 		/** @var InputfieldFieldset $fieldset */
 		$fieldset = $this->wire('modules')->get('InputfieldFieldset');
 		$fieldset->attr('name', '_adminTheme');
@@ -309,27 +309,27 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 
 	/**
 	 * Hook after MarkupAdminDataTable::render
-	 * 
+	 *
 	 * This is primarily to add support for Uikit horizontal scrolling responsive tables,
 	 * which is used instead of the default MarkupAdminDataTable responsive table.
-	 * 
+	 *
 	 * @param HookEvent $event
-	 * 
+	 *
 	 */
 	public function hookAfterTableRender(HookEvent $event) {
 		/** @var MarkupAdminDataTable $table */
 		$table = $event->object;
 		$classes = array();
 		if($table->responsive) $classes[] = 'pw-table-responsive uk-overflow-auto';
-		if($table->sortable) $classes[] = 'pw-table-sortable'; 
-		if($table->resizable) $classes[] = 'pw-table-resizable'; 
+		if($table->sortable) $classes[] = 'pw-table-sortable';
+		if($table->resizable) $classes[] = 'pw-table-resizable';
 		if(count($classes)) {
 			$class = implode(' ', $classes);
 			$event->return = "<div class='$class'>$event->return</div>";
 		}
-		
+
 	}
-	
+
 	/**
 	 * Event called when a page is saved or modules refreshed to clear caches
 	 *
@@ -346,9 +346,9 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 
 	/**
 	 * Hook to ProcessLogin::afterLoginURL()
-	 * 
+	 *
 	 * @param HookEvent $event
-	 * 
+	 *
 	 */
 	public function hookAfterLoginURL(HookEvent $event) {
 		$layout = $this->layout;
@@ -358,7 +358,7 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 		$event->return = $url;
 	}
 
-	
+
 	/*******************************************************************************************
 	 * MARKUP RENDERING METHODS
 	 *
@@ -453,7 +453,7 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 		);
 
 		$options = array_merge($defaults, $options);
-		
+
 		return parent::renderNotices($notices, $options);
 	}
 
@@ -638,7 +638,7 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 
 		return $out;
 	}
-	
+
 	/**
 	 * Identify current items in the primary nav and add appropriate classes to them
 	 *
@@ -696,9 +696,9 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 
 	/**
 	 * Get the URL to the ProcessWire or brand logo
-	 * 
+	 *
 	 * @return string
-	 * 
+	 *
 	 */
 	public function getLogoURL() {
 		$logoURL = $this->get('logoURL');
@@ -712,9 +712,9 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 
 	/**
 	 * Get the primary Uikit CSS file to use
-	 * 
+	 *
 	 * @return string
-	 * 
+	 *
 	 */
 	public function getUikitCSS() {
 		$config = $this->wire('config');
@@ -731,9 +731,9 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 
 	/**
 	 * Module configuration
-	 * 
+	 *
 	 * @param InputfieldWrapper $inputfields
-	 * 
+	 *
 	 */
 	public function getModuleConfigInputfields(InputfieldWrapper $inputfields) {
 		parent::getModuleConfigInputfields($inputfields);
@@ -741,4 +741,3 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 		AdminThemeUikitConfig($this, $inputfields);
 	}
 }
-

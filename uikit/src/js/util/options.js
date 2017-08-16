@@ -25,7 +25,7 @@ strats.destroy = function (parentVal, childVal) {
 
 // update strategy
 strats.update = function (parentVal, childVal) {
-    return strats.args(parentVal, isFunction(childVal) ? {write: childVal} : childVal);
+    return strats.args(parentVal, isFunction(childVal) ? {read: childVal} : childVal);
 };
 
 // property strategy
@@ -62,7 +62,7 @@ export function mergeOptions(parent, child) {
     var options = {}, key;
 
     if (child.mixins) {
-        for (let i = 0, l = child.mixins.length; i < l; i++) {
+        for (var i = 0, l = child.mixins.length; i < l; i++) {
             parent = mergeOptions(parent, child.mixins[i]);
         }
     }

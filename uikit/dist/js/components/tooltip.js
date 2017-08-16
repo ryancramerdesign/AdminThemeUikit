@@ -1,9 +1,9 @@
-/*! UIkit 3.0.0-beta.22 | http://www.getuikit.com | (c) 2014 - 2017 YOOtheme | MIT License */
+/*! UIkit 3.0.0-beta.28 | http://www.getuikit.com | (c) 2014 - 2017 YOOtheme | MIT License */
 
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define('uikittooltip', factory) :
-    (global.UIkitTooltip = factory());
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define('uikittooltip', factory) :
+	(global.UIkitTooltip = factory());
 }(this, (function () { 'use strict';
 
 function plugin(UIkit) {
@@ -24,7 +24,7 @@ function plugin(UIkit) {
     var pointerEnter = util.pointerEnter;
     var pointerLeave = util.pointerLeave;
 
-    var active;
+    var actives = [];
 
     UIkit.component('tooltip', {
 
@@ -73,15 +73,12 @@ function plugin(UIkit) {
                 var this$1 = this;
 
 
-                if (active === this) {
+                if (~actives.indexOf(this)) {
                     return;
                 }
 
-                if (active) {
-                    active.hide();
-                }
-
-                active = this;
+                actives.forEach(function (active) { return active.hide(); });
+                actives.push(this);
 
                 doc.on(("click." + (this.$options.name)), function (e) {
                     if (!isWithin(e.target, this$1.$el)) {
@@ -112,11 +109,13 @@ function plugin(UIkit) {
 
             hide: function hide() {
 
-                if (this.$el.is('input') && this.$el[0] === document.activeElement) {
+                var index = actives.indexOf(this);
+
+                if (!~index || this.$el.is('input') && this.$el[0] === document.activeElement) {
                     return;
                 }
 
-                active = active !== this && active || false;
+                actives.splice(index, 1);
 
                 clearTimeout(this.showTimer);
                 clearInterval(this.hideTimer);
@@ -140,7 +139,7 @@ function plugin(UIkit) {
                 }
             }, obj[pointerLeave] = function (e) {
                 if (!isTouch(e)) {
-                    this.hide()
+                    this.hide();
                 }
             }, obj )
 

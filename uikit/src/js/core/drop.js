@@ -39,7 +39,7 @@ export default function (UIkit) {
             this.clsDrop = this.clsDrop || `uk-${this.$options.name}`;
             this.clsPos = this.clsDrop;
 
-            this.$el.addClass(this.clsDrop);
+            this.$addClass(this.clsDrop);
         },
 
         ready() {
@@ -284,11 +284,13 @@ export default function (UIkit) {
                             }
 
                         } else if (active && !this.isChildOf(active) && !this.isParentOf(active)) {
+
                             var prev;
-                            while (active && active !== prev) {
+                            while (active && active !== prev && !this.isChildOf(active)) {
                                 prev = active;
                                 active.hide(false);
                             }
+
                         }
 
                         if (delay && this.delayShow) {
@@ -359,7 +361,7 @@ export default function (UIkit) {
                     var prop = this.getAxis() === 'y' ? 'width' : 'height';
                     this.$el.css(prop, alignTo[prop]);
                 } else if (this.$el.outerWidth() > Math.max(boundary.right - alignTo.left, alignTo.right - boundary.left)) {
-                    this.$el.addClass(`${this.clsDrop}-stack`);
+                    this.$addClass(`${this.clsDrop}-stack`);
                     this.$el.trigger('stack', [this]);
                 }
 
@@ -385,6 +387,11 @@ export default function (UIkit) {
         registered = true;
         doc.on('click', e => {
             var prev;
+
+            if (e.isDefaultPrevented()) {
+                return;
+            }
+
             while (active && active !== prev && !isWithin(e.target, active.$el) && !(active.toggle && isWithin(e.target, active.toggle.$el))) {
                 prev = active;
                 active.hide(false);

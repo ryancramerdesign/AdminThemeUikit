@@ -1,5 +1,5 @@
 import { Class } from '../mixin/index';
-import { $, Animation, isNumeric, isString, offsetTop, query, requestAnimationFrame } from '../util/index';
+import { $, Animation, isNumeric, isString, noop, offsetTop, query, requestAnimationFrame, toJQuery } from '../util/index';
 
 export default function (UIkit) {
 
@@ -18,6 +18,7 @@ export default function (UIkit) {
             clsInactive: String,
             clsFixed: String,
             clsBelow: String,
+            selTarget: String,
             widthElement: 'jQuery',
             showOnUp: Boolean,
             media: 'media',
@@ -33,10 +34,19 @@ export default function (UIkit) {
             clsInactive: '',
             clsFixed: 'uk-sticky-fixed',
             clsBelow: 'uk-sticky-below',
+            selTarget: '',
             widthElement: false,
             showOnUp: false,
             media: false,
             target: false
+        },
+
+        computed: {
+
+            selTarget() {
+                return this.$props.selTarget && toJQuery(this.$props.selTarget, this.$el) || this.$el;
+            }
+
         },
 
         connected() {
@@ -45,7 +55,7 @@ export default function (UIkit) {
             this.widthElement = this.$props.widthElement || this.placeholder;
 
             if (!this.isActive) {
-                this.$el.addClass(this.clsInactive);
+                this.hide();
             }
         },
 
@@ -54,7 +64,7 @@ export default function (UIkit) {
             if (this.isActive) {
                 this.isActive = false;
                 this.hide();
-                this.$el.removeClass(this.clsInactive);
+                this.$removeClass(this.clsInactive);
             }
 
             this.placeholder.remove();
@@ -75,10 +85,9 @@ export default function (UIkit) {
 
                     var top = offsetTop(target),
                         elTop = offsetTop(this.$el),
-                        elHeight = this.$el[0].offsetHeight,
-                        elBottom = elTop + elHeight;
+                        elHeight = this.$el[0].offsetHeight;
 
-                    if (elBottom >= top && elTop <= top + target[0].offsetHeight) {
+                    if (elTop + elHeight >= top && elTop <= top + target[0].offsetHeight) {
                         window.scrollTo(0, top - elHeight - this.target - this.offset);
                     }
 
@@ -86,6 +95,30 @@ export default function (UIkit) {
             }
 
         },
+
+        events: [
+
+            {
+                name: 'active',
+
+                handler() {
+                    this.$addClass(this.selTarget, this.clsActive);
+                    this.$removeClass(this.selTarget, this.clsInactive);
+                }
+
+            },
+
+            {
+                name: 'inactive',
+
+                handler() {
+                    this.$addClass(this.selTarget, this.clsInactive);
+                    this.$removeClass(this.selTarget, this.clsActive);
+                }
+
+            }
+
+        ],
 
         update: [
 
@@ -156,13 +189,15 @@ export default function (UIkit) {
 
                 read() {
                     this.offsetTop = offsetTop(this.$el);
+                    this.scroll = window.pageYOffset;
+                    this.visible = this.$el.is(':visible');
                 },
 
                 write({dir} = {}) {
 
-                    var scroll = window.pageYOffset;
+                    var scroll = this.scroll;
 
-                    if (scroll < 0 || !this.$el.is(':visible') || this.disabled || this.showOnUp && !dir) {
+                    if (scroll < 0 || !this.visible || this.disabled || this.showOnUp && !dir) {
                         return;
                     }
 
@@ -178,7 +213,7 @@ export default function (UIkit) {
                         this.isActive = false;
 
                         if (this.animation && scroll > this.topOffset) {
-                            Animation.cancel(this.$el).then(() => Animation.out(this.$el, this.animation).then(() => this.hide()));
+                            Animation.cancel(this.$el).then(() => Animation.out(this.$el, this.animation).then(() => this.hide(), noop));
                         } else {
                             this.hide();
                         }
@@ -191,7 +226,7 @@ export default function (UIkit) {
 
                         Animation.cancel(this.$el).then(() => {
                             this.show();
-                            Animation.in(this.$el, this.animation);
+                            Animation.in(this.$el, this.animation).then(null, noop);
                         });
 
                     } else {
@@ -212,44 +247,56 @@ export default function (UIkit) {
 
                 this.isActive = true;
                 this.update();
-                this.$el.trigger('active');
                 this.placeholder.attr('hidden', null);
 
             },
 
             hide() {
 
-                this.$el
-                    .addClass(this.clsInactive)
-                    .removeClass(this.clsFixed)
-                    .removeClass(this.clsActive)
-                    .removeClass(this.clsBelow)
-                    .css({position: '', top: '', width: ''})
-                    .trigger('inactive');
+                if (!this.isActive || this.$hasClass(this.selTarget, this.clsActive)) {
+                    this.$el.trigger('inactive');
+                }
 
+                this.$removeClass(this.clsFixed, this.clsBelow);
+                this.$el.css({position: '', top: '', width: ''});
                 this.placeholder.attr('hidden', true);
 
             },
 
             update() {
 
-                var top = Math.max(0, this.offset), scroll = window.pageYOffset, active = scroll > this.top;
+                var top = Math.max(0, this.offset), active = this.scroll > this.top;
 
-                if (this.bottom && scroll > this.bottom - this.offset) {
-                    top = this.bottom - scroll;
+                if (this.bottom && this.scroll > this.bottom - this.offset) {
+                    top = this.bottom - this.scroll;
                 }
 
-                this.$el
-                    .css({
-                        position: 'fixed',
-                        top: `${top}px`,
-                        width: this.width
-                    })
-                    .addClass(this.clsFixed)
-                    .toggleClass(this.clsActive, active)
-                    .toggleClass(this.clsInactive, !active)
-                    .toggleClass(this.clsBelow, scroll > this.bottomOffset);
+                this.$el.css({
+                    position: 'fixed',
+                    top: `${top}px`,
+                    width: this.width
+                });
 
+                if (this.$hasClass(this.selTarget, this.clsActive)) {
+
+                    if (!active) {
+                        this.$el.trigger('inactive');
+                    }
+
+                } else {
+
+                    if (active) {
+                        this.$el.trigger('active');
+                    }
+                }
+
+                this.$toggleClass(this.clsBelow, this.scroll > this.bottomOffset);
+
+                if (this.showOnUp) {
+                    requestAnimationFrame(() => this.$addClass(this.clsFixed));
+                } else {
+                    this.$addClass(this.clsFixed);
+                }
             }
 
         }

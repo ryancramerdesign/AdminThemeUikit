@@ -1,4 +1,4 @@
-import { createEvent, fastdom, isPlainObject, ready } from '../util/index';
+import { createEvent, fastdom, ready } from '../util/index';
 
 export default function (UIkit) {
 
@@ -92,20 +92,6 @@ export default function (UIkit) {
 
             if (e.type !== 'update' && (!update.events || !~update.events.indexOf(e.type))) {
                 return;
-            }
-
-            if (e.sync) {
-
-                if (update.read) {
-                    update.read.call(this, e);
-                }
-
-                if (update.write) {
-                    update.write.call(this, e);
-                }
-
-                return;
-
             }
 
             if (update.read && !~fastdom.reads.indexOf(this._frames.reads[i])) {

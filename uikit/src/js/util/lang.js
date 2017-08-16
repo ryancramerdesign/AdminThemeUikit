@@ -1,8 +1,8 @@
-import $, { isArray } from 'jquery';
+import $, { isNumeric } from 'jquery';
 import { getCssVar, hasPromise, isJQuery, query } from './index';
 
 export { $ };
-export { ajax, contains, each, Event, extend, map, merge, isArray, isNumeric, isFunction, isPlainObject } from 'jquery';
+export { ajax, each, Event, isNumeric } from 'jquery';
 
 export function bind(fn, context) {
     return function (a) {
@@ -66,6 +66,24 @@ function toUpper(_, c) {
     return c ? c.toUpperCase() : ''
 }
 
+export const isArray = Array.isArray;
+
+export function isFunction(obj) {
+    return typeof obj === 'function';
+}
+
+export function isObject(obj) {
+    return obj !== null && typeof obj === 'object';
+}
+
+export function isPlainObject(obj) {
+    return isObject(obj) && Object.getPrototypeOf(obj) === Object.prototype;
+}
+
+export function isBoolean(value) {
+    return typeof value === 'boolean';
+}
+
 export function isString(value) {
     return typeof value === 'string';
 }
@@ -124,7 +142,7 @@ export function toNode(element) {
 }
 
 export function toBoolean(value) {
-    return typeof value === 'boolean'
+    return isBoolean(value)
         ? value
         : value === 'true' || value === '1' || value === ''
             ? true
@@ -142,7 +160,9 @@ export function toList(value) {
     return isArray(value)
         ? value
         : isString(value)
-            ? value.split(',').map(value => toBoolean(value.trim()))
+            ? value.split(',').map(value => isNumeric(value)
+                ? toNumber(value)
+                : toBoolean(value.trim()))
             : [value];
 }
 
@@ -153,7 +173,7 @@ export function toMedia(value) {
         if (value[0] === '@') {
             var name = `media-${value.substr(1)}`;
             value = vars[name] || (vars[name] = parseFloat(getCssVar(name)));
-        } else if (value.match(/^\(min-width:/)) {
+        } else if (isNaN(value)) {
             return value;
         }
     }
@@ -206,3 +226,9 @@ export const assign = Object.assign || function (target, ...args) {
     }
     return target;
 };
+
+export function clamp(number, min = 0, max = 1) {
+    return Math.min(Math.max(number, min), max);
+}
+
+export function noop() {}

@@ -1,9 +1,9 @@
-/*! UIkit 3.0.0-beta.22 | http://www.getuikit.com | (c) 2014 - 2017 YOOtheme | MIT License */
+/*! UIkit 3.0.0-beta.28 | http://www.getuikit.com | (c) 2014 - 2017 YOOtheme | MIT License */
 
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-    typeof define === 'function' && define.amd ? define('uikitsortable', factory) :
-    (global.UIkitSortable = factory());
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define('uikitsortable', factory) :
+	(global.UIkitSortable = factory());
 }(this, (function () { 'use strict';
 
 function plugin(UIkit) {
@@ -15,16 +15,18 @@ function plugin(UIkit) {
     var mixin = UIkit.mixin;
     var util = UIkit.util;
     var $ = util.$;
+    var assign = util.assign;
     var doc = util.docElement;
-    var extend = util.extend;
+    var docHeight = util.docHeight;
+    var fastdom = util.fastdom;
     var getDimensions = util.getDimensions;
     var isWithin = util.isWithin;
-    var on = util.on;
-    var off = util.off;
+    var offset = util.offset;
     var offsetTop = util.offsetTop;
     var pointerDown = util.pointerDown;
     var pointerMove = util.pointerMove;
     var pointerUp = util.pointerUp;
+    var preventClick = util.preventClick;
     var promise = util.promise;
     var win = util.win;
 
@@ -71,12 +73,12 @@ function plugin(UIkit) {
                     e = e.originalEvent || e;
                     this$1.scrollY = window.scrollY;
                     var ref = e.touches && e.touches[0] || e;
-                    var pageX = ref.pageX;
-                    var pageY = ref.pageY;
-                    this$1.pos = {x: pageX, y: pageY};
+                    var x = ref.pageX;
+                    var y = ref.pageY;
+                    this$1.pos = {x: x, y: y};
 
                     fn(e);
-                }
+                };
             });
         },
 
@@ -89,20 +91,20 @@ function plugin(UIkit) {
 
 
                 if (this.clsEmpty) {
-                    this.$el.toggleClass(this.clsEmpty, !this.$el.children().length);
+                    this.$toggleClass(this.clsEmpty, !this.$el.children().length);
                 }
 
                 if (!this.drag) {
                     return;
                 }
 
-                this.drag.offset({top: this.pos.y + this.origin.top, left: this.pos.x + this.origin.left});
+                offset(this.drag, {top: this.pos.y + this.origin.top, left: this.pos.x + this.origin.left});
 
                 var top = offsetTop(this.drag), bottom = top + this.drag[0].offsetHeight;
 
                 if (top > 0 && top < this.scrollY) {
                     setTimeout(function () { return win.scrollTop(this$1.scrollY - 5); }, 5);
-                } else if (bottom < doc[0].offsetHeight && bottom > window.innerHeight + this.scrollY) {
+                } else if (bottom < docHeight() && bottom > window.innerHeight + this.scrollY) {
                     setTimeout(function () { return win.scrollTop(this$1.scrollY + 5); }, 5);
                 }
 
@@ -121,16 +123,16 @@ function plugin(UIkit) {
                     || this.handle && !isWithin(target, this.handle)
                     || e.button && e.button !== 0
                     || isWithin(target, ("." + (this.clsNoDrag)))
+                    || e.defaultPrevented
                 ) {
                     return;
                 }
 
                 e.preventDefault();
-                e.stopPropagation();
 
                 this.touched = [this];
                 this.placeholder = placeholder;
-                this.origin = extend({target: target, index: this.placeholder.index()}, this.pos);
+                this.origin = assign({target: target, index: this.placeholder.index()}, this.pos);
 
                 doc.on(pointerMove, this.move);
                 doc.on(pointerUp, this.end);
@@ -160,7 +162,7 @@ function plugin(UIkit) {
                 var ref = getDimensions(this.placeholder);
                 var left = ref.left;
                 var top = ref.top;
-                extend(this.origin, {left: left - this.pos.x, top: top - this.pos.y});
+                assign(this.origin, {left: left - this.pos.x, top: top - this.pos.y});
 
                 this.placeholder.addClass(this.clsPlaceholder);
                 this.$el.children().addClass(this.clsItem);
@@ -251,7 +253,8 @@ function plugin(UIkit) {
                 this.drag.remove();
                 this.drag = null;
 
-                this.touched.forEach(function (sortable) { return sortable.$el.children().removeClass(((sortable.clsPlaceholder) + " " + (sortable.clsItem))); });
+                var classes = this.touched.map(function (sortable) { return ((sortable.clsPlaceholder) + " " + (sortable.clsItem)); }).join(' ');
+                this.touched.forEach(function (sortable) { return sortable.$el.children().removeClass(classes); });
 
                 doc.removeClass(this.clsDragState);
 
@@ -308,7 +311,7 @@ function plugin(UIkit) {
                 var props = [],
                     children = this.$el.children().toArray().map(function (el) {
                         el = $(el);
-                        props.push(extend({
+                        props.push(assign({
                             position: 'absolute',
                             pointerEvents: 'none',
                             width: el.outerWidth(),
@@ -322,7 +325,8 @@ function plugin(UIkit) {
 
                 children.forEach(function (el) { return el.stop(); });
                 this.$el.children().css(reset);
-                this.$updateSync('update', true);
+                this.$update('update', true);
+                fastdom.flush();
 
                 this.$el.css('min-height', this.$el.height());
 
@@ -330,7 +334,8 @@ function plugin(UIkit) {
                 promise.all(children.map(function (el, i) { return el.css(props[i]).animate(positions[i], this$1.animation).promise(); }))
                     .then(function () {
                         this$1.$el.css('min-height', '').children().css(reset);
-                        this$1.$updateSync('update', true);
+                        this$1.$update('update', true);
+                        fastdom.flush();
                     });
 
             }
@@ -342,20 +347,6 @@ function plugin(UIkit) {
 
     function getSortable(element) {
         return UIkit.getComponent(element, 'sortable') || element.parentNode && getSortable(element.parentNode);
-    }
-
-    function preventClick() {
-        var timer = setTimeout(function () { return doc.trigger('click'); }, 0),
-            listener = function (e) {
-
-                e.preventDefault();
-                e.stopPropagation();
-
-                clearTimeout(timer);
-                off(doc, 'click', listener, true);
-            };
-
-        on(doc, 'click', listener, true);
     }
 
 }

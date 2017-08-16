@@ -1,9 +1,9 @@
-/*! UIkit 3.0.0-beta.22 | http://www.getuikit.com | (c) 2014 - 2017 YOOtheme | MIT License */
+/*! UIkit 3.0.0-beta.28 | http://www.getuikit.com | (c) 2014 - 2017 YOOtheme | MIT License */
 
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
-    typeof define === 'function' && define.amd ? define('uikittest', factory) :
-    (factory());
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
+	typeof define === 'function' && define.amd ? define('uikittest', factory) :
+	(factory());
 }(this, (function () { 'use strict';
 
 var storage = window.sessionStorage;
@@ -11,6 +11,7 @@ var key = '_uikit_style';
 var keyinverse = '_uikit_inverse';
 var themes = {};
 var $html = $('html');
+
 // try to load themes.json
 var request = new XMLHttpRequest();
 request.open('GET', '../themes.json', false);
@@ -25,14 +26,7 @@ var styles = $.extend({
         theme: {css: '../dist/css/uikit.css'}
     }, themes);
 var component = location.pathname.split('/').pop().replace(/.html$/, '');
-var components = [
-        'lightbox',
-        'marker',
-        'notification',
-        'sortable',
-        'tooltip',
-        'upload'
-    ];
+
 if (getParam('style') && getParam('style').match(/\.(json|css)$/)) {
     styles.custom = getParam('style');
 }
@@ -54,7 +48,7 @@ document.writeln(("<link rel=\"stylesheet\" href=\"" + (dir !== 'rtl' ? style.cs
 document.writeln("<script src=\"../dist/js/uikit.js\"></script>");
 document.writeln(("<script src=\"" + (style.icons ? style.icons : '../dist/js/uikit-icons.js') + "\"></script>"));
 
-$(function () {
+jQuery(function ($) {
 
     var $body = $('body');
     var $container = $('<div class="uk-container"></div>').prependTo('body');
@@ -92,22 +86,27 @@ $(function () {
         'flex',
         'form',
         'grid',
+        'grid-parallax',
         'heading',
         'height-expand',
         'height-viewport',
         'icon',
         'iconnav',
         'label',
+        'lightbox',
         'link',
         'list',
         'margin',
+        'marker',
         'modal',
         'nav',
         'navbar',
+        'notification',
         'offcanvas',
         'overlay',
         'padding',
         'pagination',
+        'parallax',
         'position',
         'placeholder',
         'progress',
@@ -116,8 +115,10 @@ $(function () {
         'search',
         'section',
         'slidenav',
+        'sortable',
         'spinner',
         'sticky',
+        'sticky-navbar',
         'subnav',
         'switcher',
         'tab',
@@ -125,12 +126,14 @@ $(function () {
         'text',
         'tile',
         'toggle',
+        'tooltip',
         'totop',
         'transition',
         'utility',
+        'upload',
         'visibility',
         'width'
-    ].concat(components).sort().forEach(function (name) { return $(("<option value=\"" + name + ".html\">" + (name.split('-').map(ucfirst).join(' ')) + "</option>")).appendTo($tests); });
+    ].sort().forEach(function (name) { return $(("<option value=\"" + name + ".html\">" + (name.split('-').map(ucfirst).join(' ')) + "</option>")).appendTo($tests); });
 
     $tests.on('change', function () {
         if ($tests.val()) {
