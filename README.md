@@ -1,9 +1,9 @@
 # Uikit 3 admin theme module 
 
-### Requires ProcessWire 3.0.54 or newer
+### Requires ProcessWire 3.0.62 or newer
 
 Currently in development and testing. Do not attempt to install on 
-ProcessWire versions prior to 3.0.54 or you will get a fatal error.
+ProcessWire versions prior to 3.0.62 or you will get a fatal error.
 
 This admin theme is intended as a starting point and framework for 
 Uikit-based admin themes. For the most part it uses the stock Uikit
