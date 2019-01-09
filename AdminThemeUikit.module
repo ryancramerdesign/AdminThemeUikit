@@ -982,7 +982,7 @@ class AdminThemeUikit extends AdminThemeFramework implements Module, Configurabl
 	 * @return string
 	 * 
 	 */
-	public function getUikitCSS() {
+	public function ___getUikitCSS() {
 		$config = $this->wire('config');
 		$cssURL = $this->get('cssURL');
 		$moduleInfo = self::getModuleInfo();
